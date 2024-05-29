@@ -7,12 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BadRequestException extends RuntimeException{
 
     private String resourceName;
-    public String getResourceName() {
-        return resourceName;
-    }
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
     public BadRequestException(String resourceName){
         super(String.format("ERROR when executing the %s method",resourceName));
         this.resourceName = resourceName;

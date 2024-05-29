@@ -3,6 +3,9 @@ package com.library.project.web.models;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -49,8 +53,8 @@ public class Libro implements Serializable{
 	@ManyToOne(optional = false)
 	private Autor autor;
 	
-	//@ManyToMany(mappedBy = "libros")
-	//@JsonIgnore
-	//private List<Prestamo> prestamos;
+	@ManyToMany(mappedBy = "libros")
+	@JsonIgnore
+	private List<Prestamo> prestamos;
 
 }

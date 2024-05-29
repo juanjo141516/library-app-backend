@@ -9,13 +9,11 @@ import com.library.project.web.services.dto.EstudianteUpdateDTO;
 
 public interface IEstudianteService {
 
-	public List<Estudiante> getListEstudiantes();
+	public List<Estudiante> getAll();
 
-	public EstudianteDTO buscarPorId(Long id);
+	public EstudianteDTO findById(Long id);
 
-	public EstudianteDTO guardar(EstudianteSaveDTO estudianteSaveDTO);
-
-	public void eliminar(Long id);
+	public EstudianteDTO save(EstudianteSaveDTO estudianteSaveDTO);
 
 	public EstudianteDTO update(EstudianteUpdateDTO estudianteUpdateDTO);
 

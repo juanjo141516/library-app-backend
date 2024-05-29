@@ -30,51 +30,27 @@ public class EstudianteController {
 	@Autowired
 	private IEstudianteService estudianteService;
 	
-	@GetMapping("listar")
-	public ResponseEntity<Object> listEstudiantes() {
-		try {
-			
-			List<Estudiante> response = this.estudianteService.getListEstudiantes();
-			return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
-		}catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON)
-					.body(e.getLocalizedMessage());
-		}
+	@GetMapping("getAll")
+	public ResponseEntity<Object> getAllEstudiantes() {
+		List<Estudiante> response = this.estudianteService.getAll();
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
 	}
 	
-	@GetMapping("/estudiante/{id}")
-	public ResponseEntity<Object> idEstudiante(@PathVariable Long id) {
-		try {
-			EstudianteDTO response = this.estudianteService.buscarPorId(id);
-			
-			return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
-		}catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON)
-					.body(e.getLocalizedMessage());
-		}
+	@GetMapping("findById/{id}")
+	public ResponseEntity<Object> findByIdEstudiante(@PathVariable Long id) {
+		EstudianteDTO response = this.estudianteService.findById(id);
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
 	}
 	
-	@PostMapping("/guardar")
+	@PostMapping("save")
 	public ResponseEntity<Object> saveEstudiante(@RequestBody EstudianteSaveDTO estudiante) {
-		try {
-			EstudianteDTO response = this.estudianteService.guardar(estudiante);
-			
-			return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
-		}catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON)
-					.body(e.getLocalizedMessage());
-		}
+		EstudianteDTO response = this.estudianteService.save(estudiante);
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
 	}
 
-	@PatchMapping("/update")
+	@PatchMapping("update")
 	public ResponseEntity<Object> updateEstudiante(@RequestBody EstudianteUpdateDTO estudiante) {
-		try {
-			EstudianteDTO response = this.estudianteService.update(estudiante);	
-			return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
-		}catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON)
-					.body(e.getLocalizedMessage());
-		}	
+		EstudianteDTO response = this.estudianteService.update(estudiante);	
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
 	}
-	
 }

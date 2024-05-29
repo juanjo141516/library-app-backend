@@ -2,6 +2,7 @@ package com.library.project.web.services.implementation;
 
 import java.util.List;
 
+import com.library.project.web.exception.ConflictException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,72 +29,62 @@ public class EstudianteServiceImpl implements IEstudianteService{
 	private ICarreraRepository carreraRepository;
 	
 	@Override
-	public List<Estudiante> getListEstudiantes(){		
+	public List<Estudiante> getAll(){
 		return estudianteRepository.findAll();
 	}
 	
 	@Override
-	public EstudianteDTO buscarPorId(Long id) {
-		Estudiante estudiante =  estudianteRepository.findById(id).orElse(null);
+	public EstudianteDTO findById(Long id) {
+		Estudiante estudiante =  estudianteRepository.findById(id).
+				orElseThrow(() -> new ResourceNotFoundException("estudiante", "id", id));
 		EstudianteDTO estudianteDTO = mapper.map(estudiante, EstudianteDTO.class);
+		estudianteDTO.setCarrera(estudiante.getCarrera());
 		return estudianteDTO;
 	}
 	
 	@Override
-	public EstudianteDTO guardar(EstudianteSaveDTO estudianteSaveDTO) {
-		
+	public EstudianteDTO save(EstudianteSaveDTO estudianteSaveDTO) {
+		checkDuplicateName(estudianteSaveDTO);
+		checkDuplicateNumberDocument(estudianteSaveDTO);
 		Estudiante estudianteModel = mapper.map(estudianteSaveDTO, Estudiante.class);
-		Carrera carreraModel = carreraRepository.findById(estudianteSaveDTO.getCarrera()).orElse(null);
-				
+		Carrera carreraModel = carreraRepository.findById(estudianteSaveDTO.getCarrera()).
+				orElseThrow(() -> new ResourceNotFoundException("carrera", "id",estudianteSaveDTO.getCarrera()));
 		estudianteModel.setCarrera(carreraModel);
-		
 		Estudiante estudianteSave = estudianteRepository.save(estudianteModel);
-
 		EstudianteDTO estudianteDTO = mapper.map(estudianteSave, EstudianteDTO.class);
-		estudianteDTO.setCarrera(estudianteSave.getCarrera().getNombre());
+		estudianteDTO.setCarrera(estudianteSave.getCarrera());
 		
 		return estudianteDTO;
+	}
+	private void checkDuplicateNumberDocument(EstudianteSaveDTO estudianteSaveDTO) {
+		if (estudianteRepository.existsByNumeroDocumento(estudianteSaveDTO.getNumeroDocumento())) {
+			throw new ConflictException("estudiante", "number document", estudianteSaveDTO.getNumeroDocumento());
+		}
+	}
+
+	private void checkDuplicateName(EstudianteSaveDTO estudianteSaveDTO) {
+		if (estudianteRepository.existsByNombre(estudianteSaveDTO.getNombre()) &&
+				estudianteRepository.existsByApellidoPaterno(estudianteSaveDTO.getApellidoPaterno()) &&
+				estudianteRepository.existsByApellidoMaterno(estudianteSaveDTO.getApellidoMaterno())) {
+			throw new ConflictException("estudiante", "name", estudianteSaveDTO.getNombre() + " " +
+					estudianteSaveDTO.getApellidoPaterno() + " " +
+					estudianteSaveDTO.getApellidoMaterno());
+		}
 	}
 	
 	@Override
 	public EstudianteDTO update(EstudianteUpdateDTO estudianteUpdateDTO){
 		Estudiante estudiante = estudianteRepository.findById(estudianteUpdateDTO.getId()).
 				orElseThrow(() -> new ResourceNotFoundException("estudiante", "id", estudianteUpdateDTO.getId()));
-				
-		if(estudianteUpdateDTO.getNombre() != null) {
-			estudiante.setNombre(estudianteUpdateDTO.getNombre()); 
-		}
-		
-		if(estudianteUpdateDTO.getApellidoPaterno() != null) {
-			estudiante.setApellidoPaterno(estudianteUpdateDTO.getApellidoPaterno()); 
-		}
-		
-		if(estudianteUpdateDTO.getApellidoMaterno() != null) {
-			estudiante.setApellidoMaterno(estudianteUpdateDTO.getApellidoMaterno()); 
-		}
-		
-		if(estudianteUpdateDTO.getCodigoEstudiante() != null) {
-			estudiante.setCodigoEstudiante(estudianteUpdateDTO.getCodigoEstudiante()); 
-		}
-		
-		if(estudianteUpdateDTO.getCorreo() != null) {
-			estudiante.setCorreo(estudianteUpdateDTO.getCorreo()); 
-		}
-		
+		mapper.map(estudianteUpdateDTO,estudiante);
 		if(estudianteUpdateDTO.getCarrera() != null) {
-			Carrera carreraModel = carreraRepository.findById(estudianteUpdateDTO.getCarrera()).orElse(null);
-			estudiante.setCarrera(carreraModel); 
+			Carrera carreraModel = carreraRepository.findById(estudianteUpdateDTO.getCarrera()).
+					orElseThrow(() -> new ResourceNotFoundException("carrera", "id",estudianteUpdateDTO.getCarrera()));
+			estudiante.setCarrera(carreraModel);
 		}
-
 		Estudiante estudianteUdpate = estudianteRepository.save(estudiante);
 		EstudianteDTO estudianteDTO = mapper.map(estudianteUdpate, EstudianteDTO.class);
-		estudianteDTO.setCarrera(estudianteUdpate.getCarrera().getNombre());
+		estudianteDTO.setCarrera(estudianteUdpate.getCarrera());
 		return estudianteDTO;
 	}
-
-	@Override
-	public void eliminar(Long id) {
-		estudianteRepository.deleteById(id);	
-	}
-	
 }
